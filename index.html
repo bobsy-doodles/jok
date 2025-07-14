@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Just Jokes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .joke-card {
+            transition: all 0.3s ease;
+        }
+        .joke-card:hover {
+            transform: translateY(-5px);
+        }
+        .jokes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .pagination-btn {
+            transition: all 0.2s ease;
+        }
+        .pagination-btn:hover:not(.active) {
+            background-color: #f3f4f6;
+        }
+        .pagination-btn.active {
+            background-color: #8b5cf6;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-100 to-blue-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-purple-800 mb-2">Just Jokes</h1>
+            <p class="text-lg text-gray-600">Your daily dose of laughter</p>
+            <p class="text-sm text-purple-600 mt-2">Over 100 jokes to brighten your day!</p>
+        </header>
+
+        <!-- Search and Filter -->
+        <div class="max-w-3xl mx-auto mb-8">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-grow">
+                    <input type="text" id="search-input" placeholder="Search jokes..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-600">
+                </div>
+                <div>
+                    <select id="category-filter" class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-600 bg-white">
+                        <option value="all">All Categories</option>
+                        <option value="dad">Dad Jokes</option>
+                        <option value="pun">Puns</option>
+                        <option value="oneliners">One-liners</option>
+                        <option value="knockknock">Knock-knock</option>
+                        <option value="animal">Animal</option>
+                        <option value="food">Food</option>
+                        <option value="tech">Tech</option>
+                        <option value="science">Science</option>
+                        <option value="math">Math</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Joke Categories -->
+        <div class="flex flex-wrap justify-center gap-4 mb-12 overflow-x-auto pb-2">
+            <button class="category-btn bg-purple-600 text-white px-6 py-2 rounded-full font-medium hover:bg-purple-700 transition-colors" data-category="all">All Jokes</button>
+            <button class="category-btn bg-white text-purple-600 px-6 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors" data-category="dad">Dad Jokes</button>
+            <button class="category-btn bg-white text-purple-600 px-6 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors" data-category="pun">Puns</button>
+            <button class="category-btn bg-white text-purple-600 px-6 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors" data-category="oneliners">One-liners</button>
+            <button class="category-btn bg-white text-purple-600 px-6 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors" data-category="knockknock">Knock-knock</button>
+            <button class="category-btn bg-white text-purple-600 px-6 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors" data-category="animal">Animal</button>
+        </div>
+
+        <!-- Jokes Container -->
+        <div id="jokes-container" class="jokes-container">
+            <!-- Jokes will be dynamically inserted here -->
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex justify-center mt-12">
+            <div class="inline-flex rounded-md shadow-sm" id="pagination">
+                <!-- Pagination buttons will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- Random Joke Button -->
+        <div class="text-center mt-12">
+            <button id="random-joke-btn" class="bg-purple-600 text-white px-8 py-3 rounded-full font-medium hover:bg-purple-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                Get Random Joke
+            </button>
+        </div>
+
+        <!-- Submit Joke Section -->
+        <div class="mt-16 bg-white rounded-xl shadow-lg p-8 max-w-2xl mx-auto">
+            <h2 class="text-2xl font-bold text-purple-800 mb-4">Submit Your Joke</h2>
+            <form id="joke-form">
+                <div class="mb-4">
+                    <label for="joke-setup" class="block text-gray-700 mb-2">Setup</label>
+                    <input type="text" id="joke-setup" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600" placeholder="Why did the chicken...">
+                </div>
+                <div class="mb-4">
+                    <label for="joke-punchline" class="block text-gray-700 mb-2">Punchline</label>
+                    <input type="text" id="joke-punchline" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600" placeholder="To get to the other side!">
+                </div>
+                <div class="mb-4">
+                    <label for="joke-category" class="block text-gray-700 mb-2">Category</label>
+                    <select id="joke-category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600">
+                        <option value="dad">Dad Joke</option>
+                        <option value="pun">Pun</option>
+                        <option value="oneliners">One-liner</option>
+                        <option value="knockknock">Knock-knock</option>
+                        <option value="animal">Animal</option>
+                        <option value="food">Food</option>
+                        <option value="tech">Tech</option>
+                        <option value="science">Science</option>
+                        <option value="math">Math</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-medium hover:bg-purple-700 transition-colors">Submit Joke</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-purple-900 text-white py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <p>© 2023 Just Jokes - Bringing smiles to your day</p>
+            <div class="flex justify-center space-x-4 mt-4">
+                <a href="#" class="hover:text-purple-300">About</a>
+                <a href="#" class="hover:text-purple-300">Contact</a>
+                <a href="#" class="hover:text-purple-300">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Jokes database - over 100 jokes
+        const jokesData = [
+            { id: 1, setup: "Why don't scientists trust atoms?", punchline: "Because they make up everything!", category: "science", likes: 42 },
+            { id: 2, setup: "I told my wife she was drawing her eyebrows too high.", punchline: "She looked surprised!", category: "dad", likes: 78 },
+            { id: 3, setup: "What do you call a fake noodle?", punchline: "An impasta!", category: "food", likes: 56 },
+            { id: 4, setup: "How do you organize a space party?", punchline: "You planet!", category: "science", likes: 63 },
+            { id: 5, setup: "I'm reading a book about anti-gravity.", punchline: "It's impossible to put down!", category: "science", likes: 91 },
+            { id: 6, setup: "Did you hear about the mathematician who's afraid of negative numbers?", punchline: "He'll stop at nothing to avoid them!", category: "math", likes: 47 },
+            { id: 7, setup: "Why did the scarecrow win an award?", punchline: "Because he was outstanding in his field!", category: "dad", likes: 53 },
+            { id: 8, setup: "I used to be a baker, but I couldn't make enough dough.", punchline: "Also, I kept getting battered.", category: "food", likes: 39 },
+            { id: 9, setup: "What's the best thing about Switzerland?", punchline: "I don't know, but the flag is a big plus.", category: "oneliners", likes: 72 },
+            { id: 10, setup: "How do you make a tissue dance?", punchline: "Put a little boogie in it!", category: "dad", likes: 65 },
+            { id: 11, setup: "What do you call a parade of rabbits hopping backwards?", punchline: "A receding hare-line.", category: "animal", likes: 44 },
+            { id: 12, setup: "Why don't eggs tell jokes?", punchline: "They'd crack each other up.", category: "food", likes: 38 },
+            { id: 13, setup: "What do you call a fish with no eyes?", punchline: "Fsh!", category: "animal", likes: 81 },
+            { id: 14, setup: "Why did the bicycle fall over?", punchline: "Because it was two-tired!", category: "dad", likes: 59 },
+            { id: 15, setup: "How does a penguin build its house?", punchline: "Igloos it together!", category: "animal", likes: 47 },
+            { id: 16, setup: "What did one wall say to the other wall?", punchline: "I'll meet you at the corner!", category: "oneliners", likes: 36 },
+            { id: 17, setup: "Why don't skeletons fight each other?", punchline: "They don't have the guts.", category: "dad", likes: 68 },
+            { id: 18, setup: "What did the janitor say when he jumped out of the closet?", punchline: "Supplies!", category: "oneliners", likes: 51 },
+            { id: 19, setup: "What did the ocean say to the beach?", punchline: "Nothing, it just waved.", category: "dad", likes: 43 },
+            { id: 20, setup: "Why did the golfer bring two pairs of pants?", punchline: "In case he got a hole in one!", category: "dad", likes: 37 },
+            { id: 21, setup: "What do you call a bear with no teeth?", punchline: "A gummy bear!", category: "animal", likes: 76 },
+            { id: 22, setup: "What's brown and sticky?", punchline: "A stick!", category: "oneliners", likes: 62 },
+            { id: 23, setup: "Why can't you give Elsa a balloon?", punchline: "Because she will let it go.", category: "pun", likes: 58 },
+            { id: 24, setup: "I'm on a seafood diet.", punchline: "I see food and I eat it.", category: "food", likes: 49 },
+            { id: 25, setup: "What do you call a cow with no legs?", punchline: "Ground beef!", category: "animal", likes: 71 },
+            { id: 26, setup: "What do you call a deer with no eyes?", punchline: "No idea (no eye deer)!", category: "animal", likes: 64 },
+            { id: 27, setup: "What do you get when you cross a snowman and a vampire?", punchline: "Frostbite!", category: "pun", likes: 53 },
+            { id: 28, setup: "What did the grape say when it got stepped on?", punchline: "Nothing, it just let out a little wine.", category: "food", likes: 46 },
+            { id: 29, setup: "Why don't scientists trust atoms?", punchline: "Because they make up everything!", category: "science", likes: 82 },
+            { id: 30, setup: "What's orange and sounds like a parrot?", punchline: "A carrot!", category: "food", likes: 39 },
+            { id: 31, setup: "Knock knock. Who's there? Interrupting cow.", punchline: "Interrupting cow wh— MOOOOO!", category: "knockknock", likes: 74 },
+            { id: 32, setup: "Why did the chicken cross the playground?", punchline: "To get to the other slide!", category: "dad", likes: 57 },
+            { id: 33, setup: "What do you call cheese that isn't yours?", punchline: "Nacho cheese!", category: "food", likes: 68 },
+            { id: 34, setup: "What did the buffalo say to his son when he left for college?", punchline: "Bison!", category: "animal", likes: 51 },
+            { id: 35, setup: "What do you call a sleeping bull?", punchline: "A bulldozer!", category: "animal", likes: 43 },
+            { id: 36, setup: "Why did the tomato turn red?", punchline: "Because it saw the salad dressing!", category: "food", likes: 37 },
+            { id: 37, setup: "What do you call a fake noodle?", punchline: "An impasta!", category: "food", likes: 79 },
+            { id: 38, setup: "How do you make a tissue dance?", punchline: "Put a little boogie in it!", category: "dad", likes: 61 },
+            { id: 39, setup: "Why did the math book look sad?", punchline: "Because it had too many problems.", category: "math", likes: 56 },
+            { id: 40, setup: "What did one hat say to the other?", punchline: "You stay here, I'll go on ahead.", category: "oneliners", likes: 48 },
+            { id: 41, setup: "What do you call a dinosaur with an extensive vocabulary?", punchline: "A thesaurus!", category: "animal", likes: 73 },
+            { id: 42, setup: "Why don't eggs tell jokes?", punchline: "They'd crack each other up.", category: "food", likes: 65 },
+            { id: 43, setup: "What do you call a cow with two legs?", punchline: "Lean beef!", category: "animal", likes: 52 },
+            { id: 44, setup: "Why did the scarecrow win an award?", punchline: "Because he was outstanding in his field!", category: "dad", likes: 44 },
+            { id: 45, setup: "What do you get when you cross a snowman and a vampire?", punchline: "Frostbite!", category: "pun", likes: 38 },
+            { id: 46, setup: "Why don't scientists trust atoms?", punchline: "Because they make up everything!", category: "science", likes: 81 },
+            { id: 47, setup: "What's a programmer's favorite place to hang out?", punchline: "Foo Bar!", category: "tech", likes: 67 },
+            { id: 48, setup: "Why did the programmer quit his job?", punchline: "Because he didn't get arrays!", category: "tech", likes: 59 },
+            { id: 49, setup: "Why do programmers always mix up Halloween and Christmas?", punchline: "Because Oct 31 == Dec 25!", category: "tech", likes: 76 },
+            { id: 50, setup: "Why was the JavaScript developer sad?", punchline: "Because he didn't Node how to Express himself!", category: "tech", likes: 63 },
+            { id: 51, setup: "Why did the developer go broke?", punchline: "Because he used up all his cache!", category: "tech", likes: 54 },
+            { id: 52, setup: "Why did the functions stop calling each other?", punchline: "Because they had too many arguments!", category: "tech", likes: 47 },
+            { id: 53, setup: "What's a computer's favorite snack?", punchline: "Microchips!", category: "tech", likes: 72 },
+            { id: 54, setup: "What do you call 8 hobbits?", punchline: "A hobbyte!", category: "tech", likes: 58 },
+            { id: 55, setup: "Why do Java developers wear glasses?", punchline: "Because they don't C#!", category: "tech", likes: 83 },
+            { id: 56, setup: "How many programmers does it take to change a light bulb?", punchline: "None, that's a hardware problem!", category: "tech", likes: 69 },
+            { id: 57, setup: "Knock knock. Who's there? Recursion.", punchline: "Recursion who? Knock knock.", category: "tech", likes: 91 },
+            { id: 58, setup: "Why did the programmer go broke?", punchline: "Because he used up all his cache!", category: "tech", likes: 53 },
+            { id: 59, setup: "What did the thermometer say to the graduated cylinder?", punchline: "You may have graduated, but I've got degrees!", category: "science", likes: 46 },
+            { id: 60, setup: "Why can't you trust atoms?", punchline: "They make up everything!", category: "science", likes: 78 },
+            { id: 61, setup: "I would tell you a chemistry joke...", punchline: "But I know I wouldn't get a reaction.", category: "science", likes: 64 },
+            { id: 62, setup: "Why did the chemist read the book on helium?", punchline: "He couldn't put it down!", category: "science", likes: 57 },
+            { id: 63, setup: "What did one tectonic plate say when it bumped into the other?", punchline: "Sorry, my fault!", category: "science", likes: 49 },
+            { id: 64, setup: "Why don't scientists trust atoms?", punchline: "Because they make up everything!", category: "science", likes: 75 },
+            { id: 65, setup: "What do you call a parade of rabbits hopping backwards?", punchline: "A receding hare-line.", category: "animal", likes: 61 },
+            { id: 66, setup: "What do you get when you cross a sheep and a kangaroo?", punchline: "A woolly jumper!", category: "animal", likes: 52 },
+            { id: 67, setup: "What do you call a sleeping bull?", punchline: "A bulldozer!", category: "animal", likes: 44 },
+            { id: 68, setup: "What do you call a cow with no legs?", punchline: "Ground beef!", category: "animal", likes: 68 },
+            { id: 69, setup: "What do you call a fish with no eyes?", punchline: "Fsh!", category: "animal", likes: 59 },
+            { id: 70, setup: "What do you call a deer with no eyes?", punchline: "No idea (no eye deer)!", category: "animal", likes: 51 },
+            { id: 71, setup: "What do you call a deer with no eyes and no legs?", punchline: "Still no idea!", category: "animal", likes: 43 },
+            { id: 72, setup: "What do you call a fly with no wings?", punchline: "A walk!", category: "animal", likes: 37 },
+            { id: 73, setup: "What do you call a dog that can do magic?", punchline: "A labracadabrador!", category: "animal", likes: 82 },
+            { id: 74, setup: "What do you call a cat that gets anything it wants?", punchline: "Purrsuasive!", category: "animal", likes: 67 },
+            { id: 75, setup: "Why don't eggs tell jokes?", punchline: "They'd crack each other up.", category: "food", likes: 58 },
+            { id: 76, setup: "What do you call cheese that isn't yours?", punchline: "Nacho cheese!", category: "food", likes: 74 },
+            { id: 77, setup: "What did the grape say when it got stepped on?", punchline: "Nothing, it just let out a little wine.", category: "food", likes: 63 },
+            { id: 78, setup: "What's orange and sounds like a parrot?", punchline: "A carrot!", category: "food", likes: 55 },
+            { id: 79, setup: "Why did the tomato turn red?", punchline: "Because it saw the salad dressing!", category: "food", likes: 47 },
+            { id: 80, setup: "What do you call a fake noodle?", punchline: "An impasta!", category: "food", likes: 72 },
+            { id: 81, setup: "I used to be a baker, but I couldn't make enough dough.", punchline: "Also, I kept getting battered.", category: "food", likes: 61 },
+            { id: 82, setup: "I'm on a seafood diet.", punchline: "I see food and I eat it.", category: "food", likes: 53 },
+            { id: 83, setup: "What did one plate say to the other?", punchline: "Dinner's on me tonight!", category: "food", likes: 45 },
+            { id: 84, setup: "Why did the cookie go to the doctor?", punchline: "Because it was feeling crumbly!", category: "food", likes: 39 },
+            { id: 85, setup: "What did the baby corn say to the mama corn?", punchline: "Where's popcorn?", category: "food", likes: 77 },
+            { id: 86, setup: "Why did the bicycle fall over?", punchline: "Because it was two-tired!", category: "dad", likes: 66 },
+            { id: 87, setup: "What did the ocean say to the beach?", punchline: "Nothing, it just waved.", category: "dad", likes: 57 },
+            { id: 88, setup: "Why did the golfer bring two pairs of pants?", punchline: "In case he got a hole in one!", category: "dad", likes: 49 },
+            { id: 89, setup: "Why don't skeletons fight each other?", punchline: "They don't have the guts.", category: "dad", likes: 71 },
+            { id: 90, setup: "How do you make a tissue dance?", punchline: "Put a little boogie in it!", category: "dad", likes: 62 },
+            { id: 91, setup: "Why did the scarecrow win an award?", punchline: "Because he was outstanding in his field!", category: "dad", likes: 54 },
+            { id: 92, setup: "I told my wife she was drawing her eyebrows too high.", punchline: "She looked surprised!", category: "dad", likes: 46 },
+            { id: 93, setup: "Why did the chicken cross the playground?", punchline: "To get to the other slide!", category: "dad", likes: 38 },
+            { id: 94, setup: "What's brown and sticky?", punchline: "A stick!", category: "oneliners", likes: 83 },
+            { id: 95, setup: "What did the janitor say when he jumped out of the closet?", punchline: "Supplies!", category: "oneliners", likes: 69 },
+            { id: 96, setup: "What did one hat say to the other?", punchline: "You stay here, I'll go on ahead.", category: "oneliners", likes: 61 },
+            { id: 97, setup: "What's the best thing about Switzerland?", punchline: "I don't know, but the flag is a big plus.", category: "oneliners", likes: 52 },
+            { id: 98, setup: "Knock knock. Who's there? Interrupting cow.", punchline: "Interrupting cow wh— MOOOOO!", category: "knockknock", likes: 73 },
+            { id: 99, setup: "Knock knock. Who's there? Boo.", punchline: "Boo who? Don't cry, it's just a joke!", category: "knockknock", likes: 64 },
+            { id: 100, setup: "Knock knock. Who's there? Lettuce.", punchline: "Lettuce who? Lettuce in, it's cold out here!", category: "knockknock", likes: 56 },
+            { id: 101, setup: "Knock knock. Who's there? Banana.", punchline: "Banana who? Knock knock. Who's there? Banana. Banana who? Knock knock. Who's there? Orange. Orange who? Orange you glad I didn't say banana?", category: "knockknock", likes: 48 },
+            { id: 102, setup: "Knock knock. Who's there? Atch.", punchline: "Atch who? Bless you!", category: "knockknock", likes: 41 },
+            { id: 103, setup: "Knock knock. Who's there? Owls.", punchline: "Owls who? Yes, they do!", category: "knockknock", likes: 79 },
+            { id: 104, setup: "Knock knock. Who's there? A broken pencil.", punchline: "A broken pencil who? Never mind, it's pointless.", category: "knockknock", likes: 65 },
+            { id: 105, setup: "Knock knock. Who's there? Cows go.", punchline: "Cows go who? No, cows go moo!", category: "knockknock", likes: 57 },
+            { id: 106, setup: "Why did the math book look sad?", punchline: "Because it had too many problems.", category: "math", likes: 49 },
+            { id: 107, setup: "Why was the equal sign so humble?", punchline: "Because it knew it wasn't greater than or less than anyone else.", category: "math", likes: 72 },
+            { id: 108, setup: "What do you call a number that can't stay in one place?", punchline: "A roamin' numeral.", category: "math", likes: 63 },
+            { id: 109, setup: "Why was six afraid of seven?", punchline: "Because seven eight nine!", category: "math", likes: 84 },
+            { id: 110, setup: "What did the zero say to the eight?", punchline: "Nice belt!", category: "math", likes: 55 }
+        ];
+
+        // Variables for pagination
+        const jokesPerPage = 12;
+        let currentPage = 1;
+        let filteredJokes = [...jokesData];
+
+        // Function to render jokes
+        function renderJokes() {
+            const jokesContainer = document.getElementById('jokes-container');
+            jokesContainer.innerHTML = '';
+            
+            const startIndex = (currentPage - 1) * jokesPerPage;
+            const endIndex = startIndex + jokesPerPage;
+            const currentJokes = filteredJokes.slice(startIndex, endIndex);
+            
+            currentJokes.forEach(joke => {
+                const jokeCard = document.createElement('div');
+                jokeCard.className = 'joke-card bg-white rounded-xl shadow-lg p-6';
+                jokeCard.dataset.id = joke.id;
+                jokeCard.dataset.category = joke.category;
+                
+                jokeCard.innerHTML = `
+                    <p class="text-gray-800 text-lg mb-4">${joke.setup}</p>
+                    <div class="answer bg-purple-50 p-4 rounded-lg">
+                        <p class="text-purple-800 font-medium">${joke.punchline}</p>
+                    </div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div class="flex space-x-2">
+                            <button class="text-gray-500 hover:text-red-500 like-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                            </button>
+                            <span class="text-gray-500">${joke.likes}</span>
+                        </div>
+                        <span class="text-sm text-gray-500 capitalize">${joke.category}</span>
+                    </div>
+                `;
+                
+                jokesContainer.appendChild(jokeCard);
+            });
+            
+            // Add event listeners to like buttons
+            document.querySelectorAll('.like-btn').forEach(btn => {
+                btn.addEventListener('click', handleLikeClick);
+            });
+            
+            // Update pagination
+            renderPagination();
+        }
+
+        // Function to render pagination
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+            
+            const totalPages = Math.ceil(filteredJokes.length / jokesPerPage);
+            
+            // Previous button
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'pagination-btn px-4 py-2 border border-gray-300 rounded-l-md';
+            prevBtn.textContent = '←';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderJokes();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+            pagination.appendChild(prevBtn);
+            
+            // Page buttons
+            const maxButtons = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+            
+            if (endPage - startPage + 1 < maxButtons) {
+                startPage = Math.max(1, endPage - maxButtons + 1);
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `pagination-btn px-4 py-2 border border-gray-300 ${i === currentPage ? 'active' : ''}`;
+                pageBtn.textContent = i;
+                pageBtn.addEventListener('click', () => {
+                    currentPage = i;
+                    renderJokes();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+                pagination.appendChild(pageBtn);
+            }
+            
+            // Next button
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'pagination-btn px-4 py-2 border border-gray-300 rounded-r-md';
+            nextBtn.textContent = '→';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderJokes();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+            pagination.appendChild(nextBtn);
+        }
+
+        // Function to handle like button clicks
+        function handleLikeClick(e) {
+            const btn = e.currentTarget;
+            const jokeCard = btn.closest('.joke-card');
+            const jokeId = parseInt(jokeCard.dataset.id);
+            const countSpan = btn.nextElementSibling;
+            
+            // Find the joke in our data
+            const jokeIndex = jokesData.findIndex(joke => joke.id === jokeId);
+            
+            if (btn.classList.contains('text-red-500')) {
+                btn.classList.remove('text-red-500');
+                btn.classList.add('text-gray-500');
+                jokesData[jokeIndex].likes--;
+            } else {
+                btn.classList.remove('text-gray-500');
+                btn.classList.add('text-red-500');
+                jokesData[jokeIndex].likes++;
+            }
+            
+            countSpan.textContent = jokesData[jokeIndex].likes;
+        }
+
+        // Function to filter jokes by category
+        function filterJokesByCategory(category) {
+            if (category === 'all') {
+                filteredJokes = [...jokesData];
+            } else {
+                filteredJokes = jokesData.filter(joke => joke.category === category);
+            }
+            
+            currentPage = 1;
+            renderJokes();
+        }
+
+        // Function to filter jokes by search term
+        function filterJokesBySearch(searchTerm) {
+            if (!searchTerm) {
+                filterJokesByCategory(document.querySelector('.category-btn.bg-purple-600').dataset.category);
+                return;
+            }
+            
+            searchTerm = searchTerm.toLowerCase();
+            filteredJokes = jokesData.filter(joke => 
+                joke.setup.toLowerCase().includes(searchTerm) || 
+                joke.punchline.toLowerCase().includes(searchTerm)
+            );
+            
+            currentPage = 1;
+            renderJokes();
+        }
+
+        // Event listeners for category buttons
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update active button styling
+                document.querySelectorAll('.category-btn').forEach(b => {
+                    b.classList.remove('bg-purple-600', 'text-white');
+                    b.classList.add('bg-white', 'text-purple-600');
+                });
+                
+                btn.classList.remove('bg-white', 'text-purple-600');
+                btn.classList.add('bg-purple-600', 'text-white');
+                
+                // Filter jokes by category
+                filterJokesByCategory(btn.dataset.category);
+            });
+        });
+
+        // Event listener for search input
+        const searchInput = document.getElementById('search-input');
+        searchInput.addEventListener('input', () => {
+            filterJokesBySearch(searchInput.value);
+        });
+
+        // Event listener for category filter dropdown
+        const categoryFilter = document.getElementById('category-filter');
+        categoryFilter.addEventListener('change', () => {
+            const category = categoryFilter.value;
+            
+            // Update active button styling
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if (btn.dataset.category === category) {
+                    btn.click();
+                }
+            });
+        });
+
+        // Random joke button
+        const randomJokeBtn = document.getElementById('random-joke-btn');
+        randomJokeBtn.addEventListener('click', () => {
+            const randomIndex = Math.floor(Math.random() * jokesData.length);
+            const randomJoke = jokesData[randomIndex];
+            
+            // Find which page the joke is on
+            const jokeIndex = filteredJokes.findIndex(joke => joke.id === randomJoke.id);
+            
+            if (jokeIndex !== -1) {
+                currentPage = Math.floor(jokeIndex / jokesPerPage) + 1;
+                renderJokes();
+                
+                // Highlight the joke
+                setTimeout(() => {
+                    const jokeCard = document.querySelector(`.joke-card[data-id="${randomJoke.id}"]`);
+                    if (jokeCard) {
+                        jokeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        jokeCard.classList.add('ring-4', 'ring-purple-500');
+                        setTimeout(() => {
+                            jokeCard.classList.remove('ring-4', 'ring-purple-500');
+                        }, 2000);
+                    }
+                }, 100);
+            } else {
+                // If the joke isn't in the filtered list, reset filters
+                document.querySelector('.category-btn[data-category="all"]').click();
+                setTimeout(() => {
+                    const jokeCard = document.querySelector(`.joke-card[data-id="${randomJoke.id}"]`);
+                    if (jokeCard) {
+                        jokeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        jokeCard.classList.add('ring-4', 'ring-purple-500');
+                        setTimeout(() => {
+                            jokeCard.classList.remove('ring-4', 'ring-purple-500');
+                        }, 2000);
+                    }
+                }, 100);
+            }
+        });
+
+        // Form submission (demo only)
+        const jokeForm = document.getElementById('joke-form');
+        jokeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const setup = document.getElementById('joke-setup').value;
+            const punchline = document.getElementById('joke-punchline').value;
+            const category = document.getElementById('joke-category').value;
+            
+            if (setup && punchline) {
+                // Create new joke
+                const newJoke = {
+                    id: jokesData.length + 1,
+                    setup,
+                    punchline,
+                    category,
+                    likes: 0
+                };
+                
+                // Add to jokes data
+                jokesData.unshift(newJoke);
+                
+                // Reset form
+                jokeForm.reset();
+                
+                // Show success message
+                alert('Thanks for submitting your joke! It has been added to the collection.');
+                
+                // Refresh jokes display
+                document.querySelector('.category-btn[data-category="all"]').click();
+            } else {
+                alert('Please fill in both the setup and punchline fields.');
+            }
+        });
+
+        // Initialize the page
+        renderJokes();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'95f48c9ce14ca29c',t:'MTc1MjUzMzExNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
