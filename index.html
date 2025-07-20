@@ -259,7 +259,7 @@
         // Load jokes from localStorage or use the base jokes
         let jokesData = [];
         
-        // Function to initialize jokes data
+        
         function initJokesData() {
             const savedJokes = localStorage.getItem('jokesData');
             if (savedJokes) {
@@ -270,10 +270,10 @@
             }
         }
 
-        // Initialize jokes data
+        
         initJokesData();
 
-        // Variables for pagination
+    
         const jokesPerPage = 12;
         let currentPage = 1;
         let filteredJokes = [...jokesData];
@@ -283,7 +283,7 @@
             localStorage.setItem('jokesData', JSON.stringify(jokesData));
         }
 
-        // Function to show notification
+        
         function showNotification(message, type = 'success') {
             const notificationContainer = document.getElementById('notification-container');
             
@@ -303,7 +303,7 @@
             notification.appendChild(text);
             notificationContainer.appendChild(notification);
             
-            // Remove notification after 3 seconds
+            
             setTimeout(() => {
                 notification.classList.add('hide');
                 setTimeout(() => {
@@ -413,15 +413,17 @@
             pagination.appendChild(nextBtn);
         }
 
-        
+
         function handleLikeClick(e) {
             const btn = e.currentTarget;
             const jokeCard = btn.closest('.joke-card');
             const jokeId = parseInt(jokeCard.dataset.id);
             const countSpan = btn.nextElementSibling;
-
             
+    
             const jokeIndex = jokesData.findIndex(joke => joke.id === jokeId);
+            
+            if (jokeIndex === -1) return;
             
             if (btn.classList.contains('text-red-500')) {
                 btn.classList.remove('text-red-500');
@@ -434,9 +436,11 @@
             }
             
             countSpan.textContent = jokesData[jokeIndex].likes;
+            
+            saveJokesToLocalStorage();
         }
 
-        
+
         function filterJokesByCategory(category) {
             if (category === 'all') {
                 filteredJokes = [...jokesData];
