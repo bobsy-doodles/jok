@@ -75,15 +75,13 @@
             <button class="category-btn bg-white text-purple-600 px-6 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors" data-category="animal">Animal</button>
         </div>
 
-        <!-- Jokes Container -->
         <div id="jokes-container" class="jokes-container">
-            <!-- Jokes will be dynamically inserted here -->
+
         </div>
 
-        <!-- Pagination -->
         <div class="flex justify-center mt-12">
             <div class="inline-flex rounded-md shadow-sm" id="pagination">
-                <!-- Pagination buttons will be dynamically inserted here -->
+
             </div>
         </div>
 
@@ -253,12 +251,12 @@
             { id: 110, setup: "What did the zero say to the eight?", punchline: "Nice belt!", category: "math", likes: 55 }
         ];
 
-        // Variables for pagination
+
         const jokesPerPage = 12;
         let currentPage = 1;
         let filteredJokes = [...jokesData];
 
-        // Function to render jokes
+
         function renderJokes() {
             const jokesContainer = document.getElementById('jokes-container');
             jokesContainer.innerHTML = '';
@@ -294,23 +292,23 @@
                 jokesContainer.appendChild(jokeCard);
             });
             
-            // Add event listeners to like buttons
+
             document.querySelectorAll('.like-btn').forEach(btn => {
                 btn.addEventListener('click', handleLikeClick);
             });
+
             
-            // Update pagination
             renderPagination();
         }
 
-        // Function to render pagination
+
         function renderPagination() {
             const pagination = document.getElementById('pagination');
             pagination.innerHTML = '';
             
             const totalPages = Math.ceil(filteredJokes.length / jokesPerPage);
             
-            // Previous button
+
             const prevBtn = document.createElement('button');
             prevBtn.className = 'pagination-btn px-4 py-2 border border-gray-300 rounded-l-md';
             prevBtn.textContent = '←';
@@ -323,8 +321,8 @@
                 }
             });
             pagination.appendChild(prevBtn);
+
             
-            // Page buttons
             const maxButtons = 5;
             let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
             let endPage = Math.min(totalPages, startPage + maxButtons - 1);
@@ -345,7 +343,7 @@
                 pagination.appendChild(pageBtn);
             }
             
-            // Next button
+
             const nextBtn = document.createElement('button');
             nextBtn.className = 'pagination-btn px-4 py-2 border border-gray-300 rounded-r-md';
             nextBtn.textContent = '→';
@@ -360,14 +358,14 @@
             pagination.appendChild(nextBtn);
         }
 
-        // Function to handle like button clicks
+        
         function handleLikeClick(e) {
             const btn = e.currentTarget;
             const jokeCard = btn.closest('.joke-card');
             const jokeId = parseInt(jokeCard.dataset.id);
             const countSpan = btn.nextElementSibling;
+
             
-            // Find the joke in our data
             const jokeIndex = jokesData.findIndex(joke => joke.id === jokeId);
             
             if (btn.classList.contains('text-red-500')) {
@@ -383,7 +381,7 @@
             countSpan.textContent = jokesData[jokeIndex].likes;
         }
 
-        // Function to filter jokes by category
+        
         function filterJokesByCategory(category) {
             if (category === 'all') {
                 filteredJokes = [...jokesData];
@@ -395,7 +393,7 @@
             renderJokes();
         }
 
-        // Function to filter jokes by search term
+        
         function filterJokesBySearch(searchTerm) {
             if (!searchTerm) {
                 filterJokesByCategory(document.querySelector('.category-btn.bg-purple-600').dataset.category);
@@ -412,10 +410,10 @@
             renderJokes();
         }
 
-        // Event listeners for category buttons
+    
         document.querySelectorAll('.category-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                // Update active button styling
+            
                 document.querySelectorAll('.category-btn').forEach(b => {
                     b.classList.remove('bg-purple-600', 'text-white');
                     b.classList.add('bg-white', 'text-purple-600');
@@ -424,23 +422,23 @@
                 btn.classList.remove('bg-white', 'text-purple-600');
                 btn.classList.add('bg-purple-600', 'text-white');
                 
-                // Filter jokes by category
+            
                 filterJokesByCategory(btn.dataset.category);
             });
         });
 
-        // Event listener for search input
+    
         const searchInput = document.getElementById('search-input');
         searchInput.addEventListener('input', () => {
             filterJokesBySearch(searchInput.value);
         });
 
-        // Event listener for category filter dropdown
+    
         const categoryFilter = document.getElementById('category-filter');
         categoryFilter.addEventListener('change', () => {
             const category = categoryFilter.value;
             
-            // Update active button styling
+            
             document.querySelectorAll('.category-btn').forEach(btn => {
                 if (btn.dataset.category === category) {
                     btn.click();
@@ -448,20 +446,20 @@
             });
         });
 
-        // Random joke button
+        
         const randomJokeBtn = document.getElementById('random-joke-btn');
         randomJokeBtn.addEventListener('click', () => {
             const randomIndex = Math.floor(Math.random() * jokesData.length);
             const randomJoke = jokesData[randomIndex];
             
-            // Find which page the joke is on
+            
             const jokeIndex = filteredJokes.findIndex(joke => joke.id === randomJoke.id);
             
             if (jokeIndex !== -1) {
                 currentPage = Math.floor(jokeIndex / jokesPerPage) + 1;
                 renderJokes();
                 
-                // Highlight the joke
+                
                 setTimeout(() => {
                     const jokeCard = document.querySelector(`.joke-card[data-id="${randomJoke.id}"]`);
                     if (jokeCard) {
@@ -473,7 +471,7 @@
                     }
                 }, 100);
             } else {
-                // If the joke isn't in the filtered list, reset filters
+            
                 document.querySelector('.category-btn[data-category="all"]').click();
                 setTimeout(() => {
                     const jokeCard = document.querySelector(`.joke-card[data-id="${randomJoke.id}"]`);
@@ -488,7 +486,7 @@
             }
         });
 
-        // Form submission (demo only)
+        // Form submission
         const jokeForm = document.getElementById('joke-form');
         jokeForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -498,7 +496,7 @@
             const category = document.getElementById('joke-category').value;
             
             if (setup && punchline) {
-                // Create new joke
+            
                 const newJoke = {
                     id: jokesData.length + 1,
                     setup,
@@ -507,23 +505,22 @@
                     likes: 0
                 };
                 
-                // Add to jokes data
+                
                 jokesData.unshift(newJoke);
                 
-                // Reset form
+        
                 jokeForm.reset();
                 
-                // Show success message
+            
                 alert('Thanks for submitting your joke! It has been added to the collection.');
                 
-                // Refresh jokes display
+                
                 document.querySelector('.category-btn[data-category="all"]').click();
             } else {
                 alert('Please fill in both the setup and punchline fields.');
             }
         });
 
-        // Initialize the page
         renderJokes();
     </script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'95f48c9ce14ca29c',t:'MTc1MjUzMzExNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
