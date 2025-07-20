@@ -539,41 +539,87 @@
             }
         });
 
-        // Form submission
+      // Form submission - fully functional with localStorage persistence
         const jokeForm = document.getElementById('joke-form');
         jokeForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
-            const setup = document.getElementById('joke-setup').value;
-            const punchline = document.getElementById('joke-punchline').value;
+            const setup = document.getElementById('joke-setup').value.trim();
+            const punchline = document.getElementById('joke-punchline').value.trim();
             const category = document.getElementById('joke-category').value;
             
             if (setup && punchline) {
-            
+                // Generate a unique ID (higher than any existing ID)
+                const maxId = jokesData.reduce((max, joke) => Math.max(max, joke.id), 0);
+                const newId = maxId + 1;
+                
+                // Create new joke
                 const newJoke = {
-                    id: jokesData.length + 1,
+                    id: newId,
                     setup,
                     punchline,
                     category,
                     likes: 0
                 };
                 
-                
+                // Add to jokes data at the beginning
                 jokesData.unshift(newJoke);
                 
-        
+                // Save to localStorage
+                saveJokesToLocalStorage();
+                
+                // Reset form
                 jokeForm.reset();
                 
-            
-                alert('Thanks for submitting your joke! It has been added to the collection.');
+                // Show success message
+                showNotification('Your joke has been added to the collection!', 'success');
                 
-                
+                // Refresh jokes display and scroll to the new joke
                 document.querySelector('.category-btn[data-category="all"]').click();
+                
+                // Scroll to the top where the new joke will appear
+                window.scrollTo({ top: document.querySelector('#jokes-container').offsetTop - 20, behavior: 'smooth' });
+                
+                // Highlight the new joke
+                setTimeout(() => {
+                    const newJokeCard = document.querySelector(`.joke-card[data-id="${newJoke.id}"]`);
+                    if (newJokeCard) {
+                        newJokeCard.classList.add('ring-4', 'ring-blue-500');
+                        setTimeout(() => {
+                            newJokeCard.classList.remove('ring-4', 'ring-blue-500');
+                        }, 2000);
+                    }
+                }, 300);
             } else {
-                alert('Please fill in both the setup and punchline fields.');
+                // Show error message for missing fields
+                const emptyFields = [];
+                if (!setup) emptyFields.push('setup');
+                if (!punchline) emptyFields.push('punchline');
+                
+                showNotification(`Please fill in the ${emptyFields.join(' and ')} fields.`, 'error');
+                
+                // Highlight empty fields
+                if (!setup) {
+                    const setupInput = document.getElementById('joke-setup');
+                    setupInput.classList.add('ring-2', 'ring-red-500');
+                    setupInput.addEventListener('input', function removeHighlight() {
+                        setupInput.classList.remove('ring-2', 'ring-red-500');
+                        setupInput.removeEventListener('input', removeHighlight);
+                    });
+                }
+                
+                if (!punchline) {
+                    const punchlineInput = document.getElementById('joke-punchline');
+                    punchlineInput.classList.add('ring-2', 'ring-red-500');
+                    punchlineInput.addEventListener('input', function removeHighlight() {
+                        punchlineInput.classList.remove('ring-2', 'ring-red-500');
+                        punchlineInput.removeEventListener('input', removeHighlight);
+                    });
+                }
             }
         });
 
+        // Initialize the page
         renderJokes();
     </script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'95f48c9ce14ca29c',t:'MTc1MjUzMzExNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
