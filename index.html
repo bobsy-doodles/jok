@@ -254,11 +254,61 @@
             { id: 113, setup: "I would tell you a chemistry joke", punchline: "but I know I wouldn't get a reaction.", category: "science", likes: 27 }
         ];
 
+        // Load jokes from localStorage or use the base jokes
+        let jokesData = [];
+        
+        // Function to initialize jokes data
+        function initJokesData() {
+            const savedJokes = localStorage.getItem('jokesData');
+            if (savedJokes) {
+                jokesData = JSON.parse(savedJokes);
+            } else {
+                jokesData = [...baseJokesData];
+                localStorage.setItem('jokesData', JSON.stringify(jokesData));
+            }
+        }
 
+        // Initialize jokes data
+        initJokesData();
+
+        // Variables for pagination
         const jokesPerPage = 12;
         let currentPage = 1;
         let filteredJokes = [...jokesData];
 
+        // Function to save jokes to localStorage
+        function saveJokesToLocalStorage() {
+            localStorage.setItem('jokesData', JSON.stringify(jokesData));
+        }
+
+        // Function to show notification
+        function showNotification(message, type = 'success') {
+            const notificationContainer = document.getElementById('notification-container');
+            
+            const notification = document.createElement('div');
+            notification.className = `notification p-4 rounded-lg shadow-lg flex items-center ${type === 'success' ? 'bg-blue-500' : 'bg-red-500'} text-white`;
+            
+            const icon = document.createElement('div');
+            icon.className = 'mr-3';
+            icon.innerHTML = type === 'success' 
+                ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>'
+                : '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+            
+            const text = document.createElement('div');
+            text.textContent = message;
+            
+            notification.appendChild(icon);
+            notification.appendChild(text);
+            notificationContainer.appendChild(notification);
+            
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.classList.add('hide');
+                setTimeout(() => {
+                    notificationContainer.removeChild(notification);
+                }, 500);
+            }, 3000);
+        }
 
         function renderJokes() {
             const jokesContainer = document.getElementById('jokes-container');
