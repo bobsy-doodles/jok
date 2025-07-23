@@ -144,6 +144,60 @@
     </footer>
 
     <div id="notification-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+
+
+        <!-- Admin Login Button (Hidden in plain sight) -->
+    <div class="fixed bottom-4 right-4 z-50">
+        <button id="admin-login-btn" class="bg-gray-200 text-gray-600 p-2 rounded-full hover:bg-gray-300 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Admin Mode Indicator -->
+    <div id="admin-mode-indicator" class="admin-mode-indicator hidden bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg">
+        <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span>Admin Mode Active</span>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="modal-content bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Admin Login</h3>
+            <form id="admin-login-form">
+                <div class="mb-4">
+                    <label for="admin-password" class="block text-gray-700 mb-2">Password</label>
+                    <input type="password" id="admin-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Enter admin password">
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="cancel-login" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="modal-content bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Delete Joke</h3>
+            <p class="text-gray-600 mb-6">Are you sure you want to delete this joke? This action cannot be undone.</p>
+            <div class="flex justify-end space-x-4">
+                <button id="cancel-delete" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">Cancel</button>
+                <button id="confirm-delete" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">Delete</button>
+            </div>
+        </div>
+    </div>
+
     
     <script>
         // Jokes database - over 100 jokes
@@ -265,7 +319,10 @@
 
         // Load jokes from localStorage or use the base jokes
         let jokesData = [];
-        
+
+                // Admin mode state
+        let isAdminMode = false;
+        const adminPassword = "jokes123"; // Change this to your desired password
         
         function initJokesData() {
             const savedJokes = localStorage.getItem('jokesData');
@@ -279,6 +336,19 @@
 
         
         initJokesData();
+
+
+             // Check if admin mode was previously enabled
+        function checkAdminMode() {
+            const adminModeEnabled = localStorage.getItem('adminModeEnabled');
+            if (adminModeEnabled === 'true') {
+                isAdminMode = true;
+                document.getElementById('admin-mode-indicator').classList.remove('hidden');
+            }
+        }
+
+        // Check admin mode on page load
+        checkAdminMode();
 
     
         const jokesPerPage = 12;
@@ -332,6 +402,58 @@
                 jokeCard.className = 'joke-card bg-white rounded-xl shadow-lg p-6';
                 jokeCard.dataset.id = joke.id;
                 jokeCard.dataset.category = joke.category;
+
+
+                // Only show delete button if in admin mode
+                const deleteButton = isAdminMode ? `
+                    <button class="delete-btn absolute top-2 right-2 text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-red-50" data-id="${joke.id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                ` : '';
+                
+                jokeCard.innerHTML = `
+                    ${deleteButton}
+                    <p class="text-gray-800 text-lg mb-4">${joke.setup}</p>
+                    <div class="answer bg-blue-50 p-4 rounded-lg">
+                        <p class="text-blue-800 font-medium">${joke.punchline}</p>
+                    </div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div class="flex space-x-2">
+                            <button class="text-gray-500 hover:text-red-500 like-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                            </button>
+                            <span class="text-gray-500">${joke.likes}</span>
+                        </div>
+                        <span class="text-sm text-gray-500 capitalize">${joke.category}</span>
+                    </div>
+                `;
+                
+                jokesContainer.appendChild(jokeCard);
+            });
+            
+            // Add event listeners to like buttons
+            document.querySelectorAll('.like-btn').forEach(btn => {
+                btn.addEventListener('click', handleLikeClick);
+            });
+            
+            // Add event listeners to delete buttons (only if in admin mode)
+            if (isAdminMode) {
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', handleDeleteClick);
+                });
+            }
+            
+            // Update pagination
+            renderPagination();
+        }
+
+
+
+                
                 
                 jokeCard.innerHTML = `
                     <p class="text-gray-800 text-lg mb-4">${joke.setup}</p>
@@ -448,6 +570,55 @@
         }
 
 
+
+        // Function to handle delete button clicks
+        function handleDeleteClick(e) {
+            const btn = e.currentTarget;
+            const jokeId = parseInt(btn.dataset.id);
+            
+            // Store the joke ID to delete
+            jokeToDelete = jokeId;
+            
+            // Show confirmation modal
+            const modal = document.getElementById('confirmation-modal');
+            modal.classList.remove('hidden');
+        }
+
+        // Function to delete a joke
+        function deleteJoke(jokeId) {
+            // Find the joke index
+            const jokeIndex = jokesData.findIndex(joke => joke.id === jokeId);
+            
+            if (jokeIndex === -1) return;
+            
+            // Get joke details for notification
+            const joke = jokesData[jokeIndex];
+            
+            // Remove the joke from the data
+            jokesData.splice(jokeIndex, 1);
+            
+            // Update filtered jokes
+            filteredJokes = filteredJokes.filter(joke => joke.id !== jokeId);
+            
+            // Save to localStorage
+            saveJokesToLocalStorage();
+            
+            // Adjust current page if needed
+            const totalPages = Math.ceil(filteredJokes.length / jokesPerPage);
+            if (currentPage > totalPages && totalPages > 0) {
+                currentPage = totalPages;
+            }
+            
+            // Re-render jokes
+            renderJokes();
+            
+            // Show notification
+            showNotification(`Joke "${joke.setup.substring(0, 20)}..." has been deleted.`, 'success');
+        }
+
+
+        
+
         function filterJokesByCategory(category) {
             if (category === 'all') {
                 filteredJokes = [...jokesData];
@@ -458,7 +629,6 @@
             currentPage = 1;
             renderJokes();
         }
-
         
         function filterJokesBySearch(searchTerm) {
             if (!searchTerm) {
@@ -476,6 +646,32 @@
             renderJokes();
         }
 
+
+
+        // Function to toggle admin mode
+        function toggleAdminMode(enable) {
+            isAdminMode = enable;
+            localStorage.setItem('adminModeEnabled', enable);
+            
+            const adminModeIndicator = document.getElementById('admin-mode-indicator');
+            if (enable) {
+                adminModeIndicator.classList.remove('hidden');
+                showNotification('Admin mode activated. You can now delete jokes.', 'success');
+            } else {
+                adminModeIndicator.classList.add('hidden');
+                showNotification('Admin mode deactivated.', 'success');
+            }
+            
+            // Re-render jokes to show/hide delete buttons
+            renderJokes();
+        }
+
+
+
+
+
+
+        
     
         document.querySelectorAll('.category-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -632,6 +828,95 @@
             }
         });
 
+
+
+        // Admin login button
+        const adminLoginBtn = document.getElementById('admin-login-btn');
+        adminLoginBtn.addEventListener('click', () => {
+            if (isAdminMode) {
+                // If already in admin mode, log out
+                toggleAdminMode(false);
+            } else {
+                // Show login modal
+                document.getElementById('admin-login-modal').classList.remove('hidden');
+            }
+        });
+
+        // Admin login form
+        const adminLoginForm = document.getElementById('admin-login-form');
+        adminLoginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const passwordInput = document.getElementById('admin-password');
+            const password = passwordInput.value;
+            
+            if (password === adminPassword) {
+                // Hide modal
+                document.getElementById('admin-login-modal').classList.add('hidden');
+                
+                // Enable admin mode
+                toggleAdminMode(true);
+                
+                // Clear password field
+                passwordInput.value = '';
+            } else {
+                // Show error
+                showNotification('Incorrect password. Please try again.', 'error');
+                
+                // Highlight password field
+                passwordInput.classList.add('ring-2', 'ring-red-500');
+                passwordInput.addEventListener('input', function removeHighlight() {
+                    passwordInput.classList.remove('ring-2', 'ring-red-500');
+                    passwordInput.removeEventListener('input', removeHighlight);
+                });
+            }
+        });
+
+        // Cancel login button
+        const cancelLoginBtn = document.getElementById('cancel-login');
+        cancelLoginBtn.addEventListener('click', () => {
+            document.getElementById('admin-login-modal').classList.add('hidden');
+            document.getElementById('admin-password').value = '';
+        });
+
+        // Confirmation modal event listeners
+        const confirmDeleteBtn = document.getElementById('confirm-delete');
+        const cancelDeleteBtn = document.getElementById('cancel-delete');
+        const confirmationModal = document.getElementById('confirmation-modal');
+
+        confirmDeleteBtn.addEventListener('click', () => {
+            if (jokeToDelete !== null) {
+                deleteJoke(jokeToDelete);
+                jokeToDelete = null;
+            }
+            confirmationModal.classList.add('hidden');
+        });
+
+        cancelDeleteBtn.addEventListener('click', () => {
+            jokeToDelete = null;
+            confirmationModal.classList.add('hidden');
+        });
+
+        // Close modals when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                    if (modal.id === 'confirmation-modal') {
+                        jokeToDelete = null;
+                    }
+                }
+            });
+        });
+
+        // Admin mode indicator click to logout
+        document.getElementById('admin-mode-indicator').addEventListener('click', () => {
+            toggleAdminMode(false);
+        });
+
+
+
+        
         // Initialize the page
         renderJokes();
     </script>
